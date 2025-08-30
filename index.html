@@ -14,10 +14,11 @@
         if (progress === 1) {
             // Game has finished loading, set up the cheat with a short delay
             setTimeout(function() {
-                // Focus the main window to ensure it can receive key events
+                // Focus the main window and body to ensure it can receive key events
                 window.focus();
+                document.body.focus();
 
-                window.addEventListener('keydown', function(event) {
+                document.body.addEventListener('keydown', function(event) {
                     if (event.key === 'c' || event.keyCode === 67) {
                         event.preventDefault();
 
@@ -65,6 +66,9 @@
         }
     };
 </script>
+</body>
+</html>
+
 </body>
 </html>
 
