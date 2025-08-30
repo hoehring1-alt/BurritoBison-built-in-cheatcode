@@ -12,60 +12,40 @@
 <script>
     window.UnityProgress = function(gameInstance, progress) {
         if (progress === 1) {
-            // Game has finished loading, set up the cheat with a short delay
+            // Game has finished loading, attempt to send a message
             setTimeout(function() {
-                // Focus the main window and body to ensure it can receive key events
-                window.focus();
-                document.body.focus();
+                try {
+                    const gameObjects = ["GameManager", "Player", "Game", "Bison", "EconomyManager"];
+                    const methods = ["AddMoney", "GiveMoney", "AddCurrency", "AddPeso", "CheatMoney"];
 
-                document.body.addEventListener('keydown', function(event) {
-                    if (event.key === 'c' || event.keyCode === 67) {
-                        event.preventDefault();
+                    let sent = false;
 
-                        try {
-                            const Module = gameInstance.Module;
-                            let potentialObjects = [];
-                            let currencyProperties = ['money', 'cash', 'coins', 'dollars', 'peso', 'score'];
-
-                            // Search for game object and currency inside the Unity Module
-                            for (let key in Module) {
-                                if (typeof Module[key] === 'object' && Module[key] !== null) {
-                                    for (let prop of currencyProperties) {
-                                        if (Module[key][prop] !== undefined) {
-                                            potentialObjects.push(`Object: ${key}, Currency: ${prop}`);
-                                        }
-                                    }
-                                }
+                    // Iterate through potential game objects and methods
+                    for (const obj of gameObjects) {
+                        for (const method of methods) {
+                            if (gameInstance.SendMessage(obj, method, 100000)) {
+                                alert(`Cheat successful! Sent message to object "${obj}" with method "${method}".`);
+                                sent = true;
+                                break;
                             }
-
-                            // Fallback check on window object
-                            if (potentialObjects.length === 0) {
-                                for (let key in window) {
-                                    if (typeof window[key] === 'object' && window[key] !== null) {
-                                        for (let prop of currencyProperties) {
-                                            if (window[key][prop] !== undefined) {
-                                                potentialObjects.push(`Object: ${key}, Currency: ${prop}`);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (potentialObjects.length > 0) {
-                                alert("Potential game objects found:\n" + potentialObjects.join("\n"));
-                            } else {
-                                alert("The 'game' object or currency property was not found.");
-                            }
-
-                        } catch (e) {
-                            alert("An error occurred with the cheat code: " + e.message);
                         }
+                        if (sent) break;
                     }
-                });
-            }, 5000); // 5-second delay to be safe
+
+                    if (!sent) {
+                        alert("Could not find the correct object and method for the cheat.");
+                    }
+
+                } catch (e) {
+                    alert("An error occurred while trying to send the message: " + e.message);
+                }
+            }, 10000); // 10-second delay to ensure the game is fully loaded
         }
     };
 </script>
+</body>
+</html>
+
 </body>
 </html>
 
