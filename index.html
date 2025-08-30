@@ -14,15 +14,19 @@
         if (progress === 1) {
             // Game has finished loading, now set up the cheat
             setTimeout(function() {
+                // Focus the main window to ensure it can receive key events
+                window.focus();
+
                 window.addEventListener('keydown', function(event) {
                     if (event.key === 'c' || event.keyCode === 67) {
                         event.preventDefault();
-                        
+
                         try {
                             const Module = gameInstance.Module;
                             let potentialObjects = [];
                             let currencyProperties = ['money', 'cash', 'coins', 'dollars', 'peso', 'score'];
 
+                            // Search for game object and currency inside the Unity Module
                             for (let key in Module) {
                                 if (typeof Module[key] === 'object' && Module[key] !== null) {
                                     for (let prop of currencyProperties) {
@@ -33,25 +37,23 @@
                                 }
                             }
 
-                            if (potentialObjects.length > 0) {
-                                alert("Potential game objects found inside Unity Module:\n" + potentialObjects.join("\n"));
-                            } else {
-                                // Fallback check on window object in case Module doesn't contain it
-                                let potentialObjectsGlobal = [];
+                            // Fallback check on window object
+                            if (potentialObjects.length === 0) {
                                 for (let key in window) {
                                     if (typeof window[key] === 'object' && window[key] !== null) {
                                         for (let prop of currencyProperties) {
                                             if (window[key][prop] !== undefined) {
-                                                potentialObjectsGlobal.push(`Object: ${key}, Currency: ${prop}`);
+                                                potentialObjects.push(`Object: ${key}, Currency: ${prop}`);
                                             }
                                         }
                                     }
                                 }
-                                if (potentialObjectsGlobal.length > 0) {
-                                    alert("Potential game objects found globally:\n" + potentialObjectsGlobal.join("\n"));
-                                } else {
-                                    alert("The 'game' object or currency property was not found.");
-                                }
+                            }
+
+                            if (potentialObjects.length > 0) {
+                                alert("Potential game objects found:\n" + potentialObjects.join("\n"));
+                            } else {
+                                alert("The 'game' object or currency property was not found.");
                             }
 
                         } catch (e) {
@@ -63,6 +65,9 @@
         }
     };
 </script>
+</body>
+</html>
+
 </body>
 </html>
 
