@@ -11,39 +11,66 @@
 
 <script>
     window.onload = function() {
-        setTimeout(function() {
-            window.addEventListener('keydown', function(event) {
-                if (event.key === 'c' || event.keyCode === 67) {
-                    event.preventDefault();
-                    
-                    try {
-                        let potentialObjects = [];
-                        let currencyProperties = ['money', 'cash', 'coins', 'dollars', 'peso', 'score'];
+        // Wait for the Unity instance to be created
+        createUnityInstance(document.querySelector("#unity-canvas"), {
+            // Your Unity loader parameters
+        }).then(unityInstance => {
+            // Use setTimeout to give the instance a few seconds to fully initialize
+            setTimeout(function() {
+                window.addEventListener('keydown', function(event) {
+                    if (event.key === 'c' || event.keyCode === 67) {
+                        event.preventDefault();
+                        
+                        try {
+                            let found = false;
+                            let currencyProperties = ['money', 'cash', 'coins', 'dollars', 'peso', 'score'];
 
-                        for (let key in window) {
-                            if (typeof window[key] === 'object' && window[key] !== null) {
-                                for (let prop of currencyProperties) {
-                                    if (window[key][prop] !== undefined) {
-                                        potentialObjects.push(`Object: ${key}, Currency: ${prop}`);
+                            // Attempt to find the game object through the Unity instance's Module
+                            for (let key in unityInstance.Module) {
+                                if (typeof unityInstance.Module[key] === 'object' && unityInstance.Module[key] !== null) {
+                                    for (let prop of currencyProperties) {
+                                        if (unityInstance.Module[key][prop] !== undefined) {
+                                            alert("Potential game object found inside Unity Module:\n" + `Object: ${key}, Currency: ${prop}`);
+                                            found = true;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (potentialObjects.length > 0) {
-                            alert("Potential game objects found:\n" + potentialObjects.join("\n"));
-                        } else {
-                            alert("The 'game' object or currency property was not found.");
-                        }
+                            if (!found) {
+                                // If not found, try searching the global window object again as a fallback
+                                let potentialObjects = [];
+                                for (let key in window) {
+                                    if (typeof window[key] === 'object' && window[key] !== null) {
+                                        for (let prop of currencyProperties) {
+                                            if (window[key][prop] !== undefined) {
+                                                potentialObjects.push(`Object: ${key}, Currency: ${prop}`);
+                                            }
+                                        }
+                                    }
+                                }
 
-                    } catch (e) {
-                        alert("An error occurred with the cheat code.");
+                                if (potentialObjects.length > 0) {
+                                    alert("Potential game objects found globally:\n" + potentialObjects.join("\n"));
+                                } else {
+                                    alert("The 'game' object or currency property was not found.");
+                                }
+                            }
+
+                        } catch (e) {
+                            alert("An error occurred with the cheat code: " + e.message);
+                        }
                     }
-                }
-            });
-        }, 2000); // 2-second delay
+                });
+            }, 5000); // 5-second delay to be safe
+        }).catch((message) => {
+            console.error("Error creating Unity instance:", message);
+        });
     };
 </script>
+</body>
+</html>
+
 </body>
 </html>
 
